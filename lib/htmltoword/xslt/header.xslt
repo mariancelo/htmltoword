@@ -17,8 +17,9 @@
                 extension-element-prefixes="func">
   <xsl:output method="xml" encoding="utf-8" omit-xml-declaration="yes" indent="yes" />
   <xsl:include href="./functions.xslt"/>
+  <xsl:include href="./tables.xslt"/>
 
-  <xsl:template match="/">
+  <xsl:template match="header">
     <w:hdr xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas"
            xmlns:cx="http://schemas.microsoft.com/office/drawing/2014/chartex"
            xmlns:cx1="http://schemas.microsoft.com/office/drawing/2015/9/8/chartex"
@@ -42,7 +43,82 @@
            xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk"
            xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"
            mc:Ignorable="w14 w15 wp14">
+      <xsl:apply-templates />
     </w:hdr>
   </xsl:template>
+
+  <xsl:template match="p[ancestor::header]">
+    <w:p>
+      <xsl:call-template name="text-alignment" />
+      <xsl:apply-templates />
+    </w:p>
+  </xsl:template>
+
+  <xsl:template name="text-alignment">
+    <xsl:param name="class" select="@class" />
+    <xsl:param name="style" select="@style" />
+    <xsl:param name="line-height" select="@line-height" />
+    <xsl:param name="margin-bottom" select="@margin-bottom" />
+    <xsl:param name="margin-top" select="@margin-top" />
+    <xsl:param name="text-indent" select="@text-indent" />
+    <xsl:param name="text-hanging" select="@text-hanging" />
+    <xsl:variable name="alignment">
+      <xsl:choose>
+        <xsl:when test="contains(concat(' ', $class, ' '), ' center ') or contains(translate(normalize-space($style),' ',''), 'text-align:center')">center</xsl:when>
+        <xsl:when test="contains(concat(' ', $class, ' '), ' right ') or contains(translate(normalize-space($style),' ',''), 'text-align:right')">right</xsl:when>
+        <xsl:when test="contains(concat(' ', $class, ' '), ' left ') or contains(translate(normalize-space($style),' ',''), 'text-align:left')">left</xsl:when>
+        <xsl:when test="contains(concat(' ', $class, ' '), ' justify ') or contains(translate(normalize-space($style),' ',''), 'text-align:justify')">both</xsl:when>
+        <xsl:otherwise></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="indent">
+      <xsl:choose>
+        <xsl:when test="$text-indent &gt; 0"><xsl:value-of select="$text-indent"/></xsl:when>
+        <xsl:otherwise></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="hanging">
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space($indent)) > 0 and string-length(normalize-space($text-hanging)) > 0"><xsl:value-of select="$text-hanging"/></xsl:when>
+        <xsl:when test="string-length(normalize-space($indent)) > 0">0</xsl:when>
+        <xsl:otherwise></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="height">
+      <xsl:choose>
+        <xsl:when test="string-length($line-height) > 0"><xsl:value-of select="@line-height"/></xsl:when>
+        <xsl:otherwise>336</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="bottom">
+      <xsl:choose>
+        <xsl:when test="string-length($margin-bottom) > 0"><xsl:value-of select="@margin-bottom"/></xsl:when>
+        <xsl:otherwise>112</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="top">
+      <xsl:choose>
+        <xsl:when test="string-length($margin-top) > 0"><xsl:value-of select="@margin-top"/></xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <w:pPr>
+      <w:spacing w:lineRule="atLeast" w:line="{$height}" w:before="{$top}" w:after="{$bottom}"/>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space($alignment)) > 0 and string-length(normalize-space($indent)) > 0">
+          <w:ind w:left="{$indent}" w:hanging="{$hanging}"/>
+          <w:jc w:val="{$alignment}"/>
+        </xsl:when>
+        <xsl:when test="string-length(normalize-space($indent)) > 0">
+          <w:ind w:left="{$indent}" w:hanging="{$hanging}"/>
+        </xsl:when>
+        <xsl:when test="string-length(normalize-space($alignment)) > 0">
+          <w:jc w:val="{$alignment}"/>
+        </xsl:when>
+      </xsl:choose>
+    </w:pPr>
+  </xsl:template>
+
+  <xsl:template match="*[not(descendant-or-self::header)]"/>
 
 </xsl:stylesheet>
