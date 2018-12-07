@@ -40,6 +40,14 @@ module Htmltoword
         'word/_rels/document.xml.rels'
       end
 
+      def footer_xml_file
+        'word/footer.xml'
+      end
+
+      def header_xml_file
+        'word/header.xml'
+      end
+
       def content_types_xml_file
         '[Content_Types].xml'
       end
@@ -92,9 +100,11 @@ module Htmltoword
     def replace_files(html, extras = false)
       html = '<body></body>' if html.nil? || html.empty?
       original_source = Nokogiri::HTML(html.gsub(/>\s+</, '><'))
+      transform_and_replace(original_source, xslt_path('header'), Document.header_xml_file)
+      transform_and_replace(original_source, xslt_path('footer'), Document.footer_xml_file)
+      transform_and_replace(original_source, xslt_path('relations'), Document.relations_xml_file)
       source = xslt(stylesheet_name: 'cleanup').transform(original_source)
       transform_and_replace(source, xslt_path('numbering'), Document.numbering_xml_file)
-      transform_and_replace(source, xslt_path('relations'), Document.relations_xml_file)
       transform_doc_xml(source, extras)
       local_images(source)
     end

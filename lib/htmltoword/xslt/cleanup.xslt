@@ -33,6 +33,8 @@
   <xsl:template match="source"/>
   <xsl:template match="style"/>
   <xsl:template match="video"/>
+  <xsl:template match="header"/>
+  <xsl:template match="footer"/>
 
   <!-- Elements currently being handled as normal text. Remove tags only -->
   <xsl:template match="abbr"><xsl:apply-templates/></xsl:template>

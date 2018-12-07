@@ -7,7 +7,7 @@
   <xsl:include href="./functions.xslt"/>
 
   <xsl:template match="a[starts-with(@href, 'http://') or starts-with(@href, 'https://')]" priority="1">
-    <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{@href}" TargetMode="External">
+    <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{@href}" TargetMode="External" Id="rId100">
       <xsl:attribute name="Id"><xsl:call-template name="relationship-id"/></xsl:attribute>
     </Relationship>
   </xsl:template>
@@ -20,7 +20,7 @@
     **Word files can be corrupted if an extension isn't present so if you are relying on the source url ensure that is has an extension.**
   -->
   <xsl:template match="img" priority="0">
-    <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image">
+    <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Id="rId101" Target="#">
       <xsl:choose>
         <xsl:when test="@data-external = 'true'">
           <xsl:attribute name="Target"><xsl:value-of select="@src"/></xsl:attribute>
@@ -50,9 +50,9 @@
       <Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/>
       <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/>
       <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
-      <xsl:apply-templates select="*"/>
+      <Relationship Id="rId8" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header.xml"/>
+      <Relationship Id="rId9" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer.xml"/>
     </Relationships>
   </xsl:template>
 
-  <xsl:template match="text()|@*"/>
 </xsl:stylesheet>
