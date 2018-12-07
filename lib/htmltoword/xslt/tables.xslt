@@ -23,10 +23,15 @@
     <w:tbl>
       <w:tblPr>
         <w:tblStyle w:val="TableGrid"/>
-        <w:tblW w:w="5000" w:type="pct"/>
+        <w:jc w:val="left"/>
+        <w:tblInd w:w="0.0" w:type="dxa"/>
         <xsl:call-template name="tableborders"/>
-        <w:tblLook w:val="0600" w:firstRow="0" w:lastRow="0" w:firstColumn="0" w:lastColumn="0" w:noHBand="1" w:noVBand="1"/>
+        <w:tblLayout w:type="fixed"/>
+        <w:tblLook w:val="0600"/>
       </w:tblPr>
+      <w:tblGrid>
+        <xsl:value-of select="./@tablegrid"/>
+      </w:tblGrid>
       <xsl:apply-templates />
     </w:tbl>
   </xsl:template>
@@ -154,6 +159,12 @@
       </xsl:if>
       <xsl:if test="@colspan &gt; 1">
         <w:gridSpan w:val="{@colspan}"/>
+      </xsl:if>
+      <xsl:if test="@rowspan &gt; 0">
+        <w:vMerge w:val="restart"/>
+      </xsl:if>
+      <xsl:if test="@rowspan=0">
+        <w:vMerge/>
       </xsl:if>
     </w:tcPr>
   </xsl:template>
